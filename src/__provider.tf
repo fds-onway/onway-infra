@@ -8,6 +8,10 @@ terraform {
       version = "~> 3.15.1"
       source  = "vercel/vercel"
     }
+    neon = {
+      source = "kislerdm/neon"
+    }
+
   }
 }
 
@@ -17,4 +21,8 @@ provider "render" {
 
 provider "vercel" {
   api_token = var.vercel_api_key
+}
+
+provider "neon" {
+  api_key = var.neon_api_key
 }
