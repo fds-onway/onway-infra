@@ -16,7 +16,8 @@ terraform {
 }
 
 provider "render" {
-  api_key = var.render_api_key
+  api_key  = var.render_api_key
+  owner_id = "usr-d2npkkre5dus739ak260"
 }
 
 provider "vercel" {
