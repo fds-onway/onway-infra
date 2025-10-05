@@ -21,6 +21,8 @@ on:
         required: true
       SERVER_SSH_KEY:
         required: true
+      DOTENV_CONTENT:
+        required: true
 
       DEPLOY_CHANNEL_DISCORD_WEBHOOK:
         required: true
