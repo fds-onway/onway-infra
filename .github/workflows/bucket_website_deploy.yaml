@@ -77,6 +77,7 @@ jobs:
   enviar-mensagem:
     name: Enviar mensagem
     runs-on: ubuntu-latest
+    if: ${{ success() }}
     steps:
       - name: Send message
         uses: Ilshidur/action-discord@master
