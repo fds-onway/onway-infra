@@ -113,7 +113,7 @@ jobs:
         with:
           args: |
             ## :x: Erro ao executar o deploy da API
-            > ✦ **Link do workflow:** https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+            > ✦ **Link do workflow:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   enviar-mensagem:
     name: Enviar mensagem
