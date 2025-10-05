@@ -1,1 +1,4 @@
+cd src
 terraform fmt
+git add .
+
