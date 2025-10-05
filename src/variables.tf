@@ -1,14 +1,9 @@
-variable "render_api_key" {
-  type      = string
-  sensitive = true
+variable "cloudflare_api_token" {
+  type    = string
+  default = ""
 }
 
-variable "vercel_api_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "neon_api_key" {
-  type      = string
-  sensitive = true
+variable "cloudflare_zone_id" {
+  type    = string
+  default = ""
 }

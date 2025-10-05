@@ -1,0 +1,27 @@
+{
+  "name": "onway-infra",
+  "version": "1.0.0",
+  "description": "Este repositório contém a infraestrutura do projeto gerenciada via Terraform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fds-onway/onway-infra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/fds-onway/onway-infra/issues"
+  },
+  "homepage": "https://github.com/fds-onway/onway-infra#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "husky": "^9.1.7"
+  }
+}

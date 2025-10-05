@@ -3,3 +3,4 @@ backend.s3.tfvars
 *.tfplan
 *.tfstate
 .terraform
+node_modules

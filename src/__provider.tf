@@ -1,29 +1,24 @@
 terraform {
   required_providers {
-    render = {
-      version = "~> 1.7.5"
-      source  = "render-oss/render"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.98.0"
     }
-    vercel = {
-      version = "~> 3.15.1"
-      source  = "vercel/vercel"
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.1.0"
     }
-    neon = {
-      source = "kislerdm/neon"
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.5.0"
     }
-
   }
 }
 
-provider "render" {
-  api_key  = var.render_api_key
-  owner_id = "usr-d2npkkre5dus739ak260"
+provider "aws" {
+  region = "us-east-1"
 }
 
-provider "vercel" {
-  api_token = var.vercel_api_key
-}
-
-provider "neon" {
-  api_key = var.neon_api_key
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }
