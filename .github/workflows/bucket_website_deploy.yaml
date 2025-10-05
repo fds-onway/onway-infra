@@ -1,0 +1,90 @@
+name: Website Deploy
+
+on:
+  workflow_call:
+    inputs:
+      bucket_name:
+        description: 'O nome do bucket que está o website'
+        required: true
+        type: string
+      region:
+        required: false
+        type: string
+        default: us-east-1
+
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      CLOUDFRONT_DISTRIBUTION_ID:
+        required: true
+      DEPLOY_CHANNEL_DISCORD_WEBHOOK:
+        required: true
+
+jobs:
+  build-and-deploy-app:
+    name: Buildar e fazer o Deploy da aplicação
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.region }}
+
+      - name: Setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build da aplicação
+        run: |
+          npm ci
+          npm run build
+
+      - name: Copiar arquivos para o Bucket S3
+        run: |
+            aws s3 sync dist/ s3://${{ inputs.bucket_name }} \
+              --region ${{ inputs.region }} \
+              --acl public-read \
+              --delete
+
+
+      # Limpa o cache de arquivos antigos
+      - name: Create cloudfront invalidation
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+  enviar-mensagem-erro:
+    name: Enviar mensagem
+    needs: [build-and-deploy-app]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOY_CHANNEL_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ## :x: Erro ao executar o deploy do Website
+            > ✦ **Link do workflow:** https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+  enviar-mensagem:
+    name: Enviar mensagem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOY_CHANNEL_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ## :package: Novo Deployment do **Website**
+            > ✦ **Versão:** ${{ github.run_number }}
+            > ✦ **Link:** https://${{ inputs.bucket_name }}/
+            > ✦ **Autor:** **${{ github.actor }}**

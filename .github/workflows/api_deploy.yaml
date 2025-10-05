@@ -1,0 +1,130 @@
+name: API Deploy
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+
+      image_name:
+        required: true
+        type: string
+
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+      SERVER_PUBLIC_IP:
+        required: true
+      SERVER_SSH_KEY:
+        required: true
+
+      DEPLOY_CHANNEL_DISCORD_WEBHOOK:
+        required: true
+
+jobs:
+  build-and-push-image:
+    name: Build e Push da Imagem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:v${{ github.run_number }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy da aplicação
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: [build-and-push-image]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose file
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_PUBLIC_IP }}
+          username: admin
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yaml"
+          target: "/home/admin/${{ inputs.app_name }}"
+
+      - name: Configure docker and start application
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_PUBLIC_IP }}
+          username: admin
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            sudo apt-get install ca-certificates curl -y
+            sudo install -m 0755 -d /etc/apt/keyrings
+            sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+            sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+            echo \
+              "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+              $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+
+            sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+            mkdir -p /home/admin/${{ inputs.app_name }}
+            cd /home/admin/${{ inputs.app_name }}
+            echo "${{ secrets.DOTENV_CONTENT }}" > .env
+            echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            sudo docker compose up --pull always -d
+
+  enviar-mensagem-erro:
+    name: Enviar mensagem
+    needs: [deploy]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOY_CHANNEL_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ## :x: Erro ao executar o deploy da API
+            > ✦ **Link do workflow:** https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+  enviar-mensagem:
+    name: Enviar mensagem
+    needs: [deploy]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOY_CHANNEL_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ## :package: Novo Deployment da **API**
+            > ✦ **Versão da imagem:** ${{ github.run_number }}
+            > ✦ **Autor:** **${{ github.actor }}**
