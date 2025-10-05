@@ -13,4 +13,36 @@ resource "cloudflare_dns_record" "acm_certificate_validation" {
   type    = each.value.type
   ttl     = 1
   proxied = false
+
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "cloudflare_dns_record" "onway_website" {
+  zone_id = var.cloudflare_zone_id
+
+  name    = "www"
+  content = module.onway_website.cloudfront_endpoint
+  type    = "CNAME"
+  ttl     = 300
+  proxied = false
+
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "cloudflare_dns_record" "onway_api" {
+  zone_id = var.cloudflare_zone_id
+
+  name    = "api"
+  content = module.onway_api_cloudfront.cloudfront_endpoint
+  type    = "CNAME"
+  ttl     = 300
+  proxied = false
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
