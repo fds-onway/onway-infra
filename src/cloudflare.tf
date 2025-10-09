@@ -33,16 +33,3 @@ resource "cloudflare_dns_record" "onway_website" {
   }
 }
 
-resource "cloudflare_dns_record" "onway_api" {
-  zone_id = var.cloudflare_zone_id
-
-  name    = "api"
-  content = module.onway_api_cloudfront.cloudfront_endpoint
-  type    = "CNAME"
-  ttl     = 300
-  proxied = false
-
-  lifecycle {
-    ignore_changes = all
-  }
-}
