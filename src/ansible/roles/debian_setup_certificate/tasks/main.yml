@@ -1,0 +1,42 @@
+---
+- name: Instalar certbot via APT
+  ansible.builtin.apt:
+    name:
+      - certbot
+    state: present
+    update_cache: yes
+
+- name: Verificar se o certificado já existe
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ project_domain }}/fullchain.pem
+  register: cert_file
+
+- name: Gerar o certificado se não existir
+  ansible.builtin.command:
+    cmd: >
+      certbot certonly
+        --standalone
+        --non-interactive
+        --agree-tos
+        --email {{ certbot_email }}
+        -d {{ project_domain }}
+  when: not cert_file.stat.exists
+
+- name: Garantir que o diretório /etc/letsencrypt exista
+  ansible.builtin.file:
+    path: /etc/letsencrypt
+    state: directory
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+- name: Gerar um grupo de parâmetros Diffie-Hellman
+  ansible.builtin.command:
+    cmd: openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 1024
+    creates: /etc/letsencrypt/ssl-dhparams.pem
+
+- name: Garantir que o timer de renovação automática do Certbot esteja ativo
+  ansible.builtin.service:
+    name: certbot.timer
+    state: started
+    enabled: yes

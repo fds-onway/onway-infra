@@ -1,0 +1,37 @@
+---
+- name: Instalar pacotes pré-requisito
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Criar o diretório para as chaves do APT
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Gerar a chave GPG oficial do Docker
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    force: true
+
+- name: Adicionar repositório Docker
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Garantir que o serviço Docker esteja iniciado e habilitado
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes

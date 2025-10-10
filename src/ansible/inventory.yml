@@ -1,0 +1,12 @@
+all:
+  hosts:
+    server:
+      # ansible_host:        Adicionar via -e "ansible_host=IP_DO_SERVIDOR"
+      ansible_user: root
+      ansible_private_key_file: ./server_key.pem
+
+      project_folder: /home/root/onway-api
+      project_domain: api.crassus.app.br
+      certbot_email: matheusazrmerlos@proton.me
+      project_port: "3000"
+

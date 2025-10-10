@@ -4,3 +4,4 @@ backend.s3.tfvars
 *.tfstate
 .terraform
 node_modules
+*.pem

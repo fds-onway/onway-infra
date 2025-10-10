@@ -1,0 +1,13 @@
+- name: Criar o diretório do projeto
+  ansible.builtin.file:
+    path: "{{ project_folder }}"
+    state: directory
+    mode: '0644'
+
+- name: Criar o arquivo de configuracao do Nginx a partir do template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ project_folder }}/nginx.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"

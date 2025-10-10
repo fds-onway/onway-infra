@@ -1,0 +1,10 @@
+---
+- name: Configurar servidor para a API
+  hosts: server
+  become: yes
+  any_errors_fatal: true
+  gather_facts: true
+  roles:
+    - debian_setup_docker
+    - debian_setup_certificate
+    - setup_project_folder

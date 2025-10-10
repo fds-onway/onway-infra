@@ -1,4 +1,4 @@
-cd src
+cd src/terraform
 terraform fmt
 git add .
 
