@@ -30,10 +30,21 @@
     owner: 'root'
     group: 'root'
 
-- name: Gerar um grupo de parâmetros Diffie-Hellman
+- name: Gerar um grupo de parâmetros Diffie-Hellman (Esse Step demora bastante)
   ansible.builtin.command:
-    cmd: openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 1024
+    cmd: openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
     creates: /etc/letsencrypt/ssl-dhparams.pem
+
+- name: Configurar a renovação do Certbot para usar o método webroot
+  community.general.ini_file:
+    path: "/etc/letsencrypt/renewal/{{ project_domain }}.conf"
+    section: renewalparams
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: '0644'
+  loop:
+    - { option: 'authenticator', value: 'webroot' }
+    - { option: 'webroot_path', value: '/var/www/html,' }
 
 - name: Garantir que o timer de renovação automática do Certbot esteja ativo
   ansible.builtin.service:
