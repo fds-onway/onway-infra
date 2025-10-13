@@ -22,7 +22,7 @@ Estas são as configurações que você precisa "manualmente" para aplicar a inf
 
 Ao ter essas 3 coisas "principais", você pode partir para as informações que serão configuradas no Terraform:
 - Uma **chave de API da sua conta CloudFlare**, que tenha **permissões** necessárias para **manipular registros DNS**.
-- **O ID da sua zona CloudFlare**, o qual pode ser pego facilmente ao entrar no CloudFlare -> Selecionar seu domínio -> Scrollar até o final -> Pegar o valor do campo "Zone ID" dentro da seção "API"
+- **O ID da sua zona CloudFlare**, o qual pode ser pego facilmente ao entrar no CloudFlare -> `<Selecionar seu domínio>` -> Scrollar até o final -> Pegar o valor do campo "Zone ID" dentro da seção "API"
 - Uma **chave de API da DigitalOcean** com permissão geral à sua conta
 
 #### 2. Arquivo `sensitive.auto.tfvars`
