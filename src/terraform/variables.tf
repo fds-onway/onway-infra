@@ -12,3 +12,8 @@ variable "digitalocean_token" {
   type    = string
   default = null
 }
+
+variable "domain" {
+  type    = string
+  default = null
+}
