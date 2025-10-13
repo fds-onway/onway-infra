@@ -112,6 +112,7 @@ E então, salve essas 3 informações:
 - Username
 - Senha
 - Nome do Repositório
+
 Pois você irá utilizá-las para configurar o **.env** do repositório da API posteriormente
 
 ### Configuração de Discord
