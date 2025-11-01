@@ -39,10 +39,10 @@ resource "aws_s3_bucket_cors_configuration" "cors_configuration" {
   bucket = aws_s3_bucket.this.id
 
   cors_rule {
-    allowed_headers = [ "*" ]
-    allowed_methods = [ "GET", "POST", "PUT", "DELETE", "HEAD" ]
-    allowed_origins = [ "*" ]
-    expose_headers  = [  ]
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "POST", "PUT", "DELETE", "HEAD"]
+    allowed_origins = ["*"]
+    expose_headers  = []
     max_age_seconds = 3000
   }
 }
@@ -54,8 +54,8 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:GetObject"
     ]
     principals {
-      type = "AWS"
-      identifiers = [ "*" ]
+      type        = "AWS"
+      identifiers = ["*"]
     }
     resources = [
       "arn:aws:s3:::${aws_s3_bucket.this.id}/*"
@@ -68,5 +68,5 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
   policy = data.aws_iam_policy_document.bucket_policy.json
 
-  depends_on = [ aws_s3_bucket_public_access_block.bucket_access ]
+  depends_on = [aws_s3_bucket_public_access_block.bucket_access]
 }

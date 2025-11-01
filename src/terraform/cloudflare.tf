@@ -53,15 +53,23 @@ resource "cloudflare_dns_record" "onway_ses_domain_validation" {
   type    = "TXT"
   ttl     = 3600
   content = aws_ses_domain_identity.onway_ses_domain.verification_token
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "cloudflare_dns_record" "ses_dkim_records" {
   for_each = toset(aws_ses_domain_dkim.onway_dkim.dkim_tokens)
 
   zone_id = var.cloudflare_zone_id
-  name = "${each.value}._domainkey"
-  type = "CNAME"
-  ttl = 3600
+  name    = "${each.value}._domainkey"
+  type    = "CNAME"
+  ttl     = 3600
   content = "${each.value}.dkim.amazonses.com"
   proxied = false
+
+  lifecycle {
+    ignore_changes = all
+  }
 }

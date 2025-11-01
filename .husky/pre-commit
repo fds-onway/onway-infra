@@ -1,4 +1,4 @@
 cd src/terraform
-terraform fmt
+terraform fmt -recursive
 git add .
 
