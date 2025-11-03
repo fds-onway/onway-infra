@@ -27,3 +27,14 @@ output "onway_ses_user_secret_access_key" {
   value     = module.onway_ses_iam_user.secret_access_key
   sensitive = true
 }
+
+
+output "onway_cdn_user_access_key_id" {
+  value     = module.onway_cdn_iam_user.access_key_id
+  sensitive = true
+}
+
+output "onway_cdn_user_secret_access_key" {
+  value     = module.onway_cdn_iam_user.secret_access_key
+  sensitive = true
+}

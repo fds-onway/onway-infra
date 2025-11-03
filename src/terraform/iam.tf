@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "onway_ses_policy" {
     actions = [
       "ses:SendEmail"
     ]
-    resources = [aws_ses_domain_identity.onway_ses_domain.arn]
+    resources = ["*"]
   }
 }
 
@@ -58,5 +58,45 @@ module "onway_ses_iam_user" {
   name                = "onway-ses-user"
   policy_name         = "OnWaySESPolicy"
   policy              = data.aws_iam_policy_document.onway_ses_policy.json
+  generate_access_key = true
+}
+
+
+
+
+
+data "aws_iam_policy_document" "cdn_user_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketAcl",
+      "s3:PutBucketAcl"
+    ]
+    resources = [
+      aws_s3_bucket.cdn_bucket.arn
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:GetObjectAcl",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "${aws_s3_bucket.cdn_bucket.arn}/*"
+    ]
+  }
+}
+
+module "onway_cdn_iam_user" {
+  source = "./modules/iam-user"
+
+  name                = "onway-cdn-user"
+  policy_name         = "OnWayCDNPolicy"
+  policy              = data.aws_iam_policy_document.cdn_user_policy.json
   generate_access_key = true
 }
