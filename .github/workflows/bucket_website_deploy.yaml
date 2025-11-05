@@ -42,10 +42,13 @@ jobs:
         with:
           node-version: 20
 
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Build da aplicação
         run: |
-          npm ci
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Copiar arquivos para o Bucket S3
         run: |
