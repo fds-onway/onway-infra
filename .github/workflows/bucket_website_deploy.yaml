@@ -21,6 +21,8 @@ on:
         required: true
       DEPLOY_CHANNEL_DISCORD_WEBHOOK:
         required: true
+      DOTENV_CONTENT:
+        required: true
 
 jobs:
   build-and-deploy-app:
@@ -46,6 +48,10 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+
+      - name: Criar arquivo .env
+        run: |
+          echo "${{ secrets.DOTENV_CONTENT }}" > .env
 
       - name: Build da aplicação
         run: |
