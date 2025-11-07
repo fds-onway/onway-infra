@@ -23,8 +23,6 @@ on:
         required: true
       DOTENV_CONTENT:
         required: true
-      FIREBASE_ADMIN_SECRET_BASE64:
-        required: true
 
       DEPLOY_CHANNEL_DISCORD_WEBHOOK:
         required: true
@@ -94,7 +92,6 @@ jobs:
           script: |
             cd /home/root/${{ inputs.app_name }}
             echo "${{ secrets.DOTENV_CONTENT }}" > .env
-            echo "${{ secrets.FIREBASE_ADMIN_SECRET_BASE64 }}" | base64 -d > firebase-admin-secret.json
             echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             sudo docker compose up --pull always -d
 
